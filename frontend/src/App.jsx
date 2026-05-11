@@ -1,40 +1,45 @@
-import React, { useState } from 'react';
-import WeatherCard from './components/WeatherCard';
+import React, { useState, useEffect } from 'react';
+import FullMap from './components/MapCard';
+import Sidebar from './components/Sidebar';
+import BottomPanel from './components/BottomPanel';
 import './App.css';
 
 /**
- * Main App component for the Weather Application.
- * This component manages the state for city search and weather data display.
+ * Strategic Agriculture Command Center App
  */
 function App() {
   const [city, setCity] = useState('');
   const [weatherData, setWeatherData] = useState(null);
+  const [activeField, setActiveField] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  /**
-   * Handles the weather search functionality.
-   * Calls the backend API to fetch weather data for the specified city.
-   */
-  const handleSearch = async () => {
-    if (!city.trim()) {
-      setError('Please enter a city name');
-      return;
+  // Initial load
+  useEffect(() => {
+    handleSearch('Campo Grande'); 
+    fetchFields();
+  }, []);
+
+  const fetchFields = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/fields');
+      const data = await response.json();
+      if (data.length > 0) setActiveField(data[0]);
+    } catch (err) {
+      console.error("Failed to fetch fields", err);
     }
+  };
+
+  const handleSearch = async (searchCity) => {
+    const targetCity = searchCity || city;
+    if (!targetCity.trim()) return;
 
     setLoading(true);
     setError('');
-    setWeatherData(null);
 
     try {
-      // Call the backend API endpoint
-      const response = await fetch(`http://localhost:8080/api/weather/${city}`);
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to fetch weather data');
-      }
-
+      const response = await fetch(`http://localhost:8080/api/weather/${targetCity}`);
+      if (!response.ok) throw new Error('Location not found');
       const data = await response.json();
       setWeatherData(data);
     } catch (err) {
@@ -44,60 +49,49 @@ function App() {
     }
   };
 
-  /**
-   * Handles form submission (Enter key press)
-   */
   const handleSubmit = (e) => {
     e.preventDefault();
     handleSearch();
   };
 
   return (
-    <div className="app">
-      <header className="app-header">
-        <h1>Weather App</h1>
-        <p>Get current weather information for any city</p>
-      </header>
-
-      <main className="app-main">
-        {/* Search Form */}
-        <form className="search-form" onSubmit={handleSubmit}>
-          <div className="search-input-group">
+    <div className="app-container">
+      {/* Search Overlay */}
+      <div className="top-overlay">
+        <form className="strategic-search" onSubmit={handleSubmit}>
+          <div className="search-box">
+            <span className="search-icon">🔍</span>
             <input
               type="text"
               value={city}
               onChange={(e) => setCity(e.target.value)}
-              placeholder="Enter city name..."
+              placeholder="Search Strategic Region..."
               className="search-input"
-              disabled={loading}
             />
-            <button
-              type="submit"
-              className="search-button"
-              disabled={loading}
-            >
-              {loading ? 'Searching...' : 'Search'}
+            <button type="submit" className="search-submit" disabled={loading}>
+              {loading ? '...' : 'ANALYSIS'}
             </button>
           </div>
+          {error && <div className="search-error">{error}</div>}
         </form>
+      </div>
 
-        {/* Error Message */}
-        {error && (
-          <div className="error-message">
-            <p>{error}</p>
-          </div>
-        )}
+      {/* Main Map Background */}
+      <FullMap weather={weatherData} />
 
-        {/* Weather Card */}
-        {weatherData && <WeatherCard weather={weatherData} />}
+      {/* Right Sidebar */}
+      <Sidebar weather={weatherData} field={activeField} />
 
-        {/* Loading State */}
-        {loading && (
-          <div className="loading">
-            <p>Loading weather data...</p>
-          </div>
-        )}
-      </main>
+      {/* Bottom Analytics */}
+      <BottomPanel field={activeField} />
+
+      {/* Loading Overlay */}
+      {loading && (
+        <div className="global-loader">
+          <div className="loader-ring"></div>
+          <span>Processing Satellite Data...</span>
+        </div>
+      )}
     </div>
   );
 }

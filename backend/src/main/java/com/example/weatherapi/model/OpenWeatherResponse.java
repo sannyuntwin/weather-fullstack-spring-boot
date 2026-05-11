@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OpenWeatherResponse {
     
+    private Coord coord;
     private String name;
     private Main main;
     private Weather[] weather;
@@ -17,6 +18,14 @@ public class OpenWeatherResponse {
     private Sys sys;
 
     // Getters and Setters
+    public Coord getCoord() {
+        return coord;
+    }
+
+    public void setCoord(Coord coord) {
+        this.coord = coord;
+    }
+
     public String getName() {
         return name;
     }
@@ -58,6 +67,27 @@ public class OpenWeatherResponse {
     }
 
     // Nested static classes to match OpenWeather API structure
+    public static class Coord {
+        private double lat;
+        private double lon;
+
+        public double getLat() {
+            return lat;
+        }
+
+        public void setLat(double lat) {
+            this.lat = lat;
+        }
+
+        public double getLon() {
+            return lon;
+        }
+
+        public void setLon(double lon) {
+            this.lon = lon;
+        }
+    }
+
     public static class Main {
         private double temp;
         private double feels_like;
@@ -89,8 +119,17 @@ public class OpenWeatherResponse {
     }
 
     public static class Weather {
+        private String main;
         private String description;
         private String icon;
+
+        public String getMain() {
+            return main;
+        }
+
+        public void setMain(String main) {
+            this.main = main;
+        }
 
         public String getDescription() {
             return description;

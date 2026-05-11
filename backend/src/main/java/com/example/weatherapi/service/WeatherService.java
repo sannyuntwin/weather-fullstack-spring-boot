@@ -1,5 +1,6 @@
 package com.example.weatherapi.service;
 
+import com.example.weatherapi.model.AgricultureAdvice;
 import com.example.weatherapi.model.OpenWeatherResponse;
 import com.example.weatherapi.model.WeatherResponse;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,7 +58,13 @@ public class WeatherService {
                     .block(); // Block to wait for response (synchronous call)
 
             // Convert OpenWeather response to our WeatherResponse format
-            return convertToWeatherResponse(openWeatherResponse);
+            WeatherResponse weatherResponse = convertToWeatherResponse(openWeatherResponse);
+            
+            // Generate agriculture advice based on weather conditions
+            AgricultureAdvice agricultureAdvice = generateAgricultureAdvice(weatherResponse, openWeatherResponse);
+            weatherResponse.setAgricultureAdvice(agricultureAdvice);
+            
+            return weatherResponse;
 
         } catch (WebClientResponseException e) {
             if (e.getStatusCode().value() == 404) {
@@ -97,6 +104,127 @@ public class WeatherService {
             response.setIcon(openWeatherResponse.getWeather()[0].getIcon());
         }
         
+        // Set coordinates
+        if (openWeatherResponse.getCoord() != null) {
+            response.setLatitude(openWeatherResponse.getCoord().getLat());
+            response.setLongitude(openWeatherResponse.getCoord().getLon());
+        }
+        
         return response;
+    }
+
+    /**
+     * Generates agriculture advice based on weather conditions.
+     * 
+     * @param weatherResponse Processed weather response
+     * @param openWeatherResponse Raw OpenWeather API response
+     * @return AgricultureAdvice with farming recommendations
+     */
+    private AgricultureAdvice generateAgricultureAdvice(WeatherResponse weatherResponse, OpenWeatherResponse openWeatherResponse) {
+        AgricultureAdvice advice = new AgricultureAdvice();
+        
+        // Irrigation advice based on rain and humidity
+        String irrigationAdvice = generateIrrigationAdvice(openWeatherResponse, weatherResponse);
+        advice.setIrrigationAdvice(irrigationAdvice);
+        
+        // Temperature advice
+        String temperatureAdvice = generateTemperatureAdvice(weatherResponse);
+        advice.setTemperatureAdvice(temperatureAdvice);
+        
+        // Humidity advice
+        String humidityAdvice = generateHumidityAdvice(weatherResponse);
+        advice.setHumidityAdvice(humidityAdvice);
+        
+        // General advice
+        String generalAdvice = generateGeneralAdvice(openWeatherResponse, weatherResponse);
+        advice.setGeneralAdvice(generalAdvice);
+        
+        return advice;
+    }
+
+    private String generateIrrigationAdvice(OpenWeatherResponse openWeatherResponse, WeatherResponse weatherResponse) {
+        // Check if rain is expected
+        if (openWeatherResponse.getWeather() != null && openWeatherResponse.getWeather().length > 0) {
+            String weatherMain = openWeatherResponse.getWeather()[0].getMain().toLowerCase();
+            String weatherDescription = openWeatherResponse.getWeather()[0].getDescription().toLowerCase();
+            
+            if (weatherMain.contains("rain") || weatherDescription.contains("rain") || 
+                weatherMain.contains("drizzle") || weatherDescription.contains("drizzle")) {
+                return "🌧️ Rain expected - No need to irrigate today";
+            }
+        }
+        
+        // Check humidity levels
+        double humidity = weatherResponse.getHumidity();
+        if (humidity > 80) {
+            return "💧 High humidity - Reduce irrigation to prevent waterlogging";
+        } else if (humidity < 30) {
+            return "🏜️ Very low humidity - Increase irrigation frequency";
+        } else {
+            return "💦 Moderate conditions - Regular irrigation recommended";
+        }
+    }
+
+    private String generateTemperatureAdvice(WeatherResponse weatherResponse) {
+        double temperature = weatherResponse.getTemperature();
+        
+        if (temperature > 35) {
+            return "🌡️ Very high temperature - Water crops early morning or evening to prevent evaporation loss";
+        } else if (temperature > 30) {
+            return "☀️ High temperature - Consider shading for sensitive crops and increase water supply";
+        } else if (temperature < 10) {
+            return "❄️ Low temperature - Reduce irrigation and protect sensitive crops from frost";
+        } else if (temperature < 5) {
+            return "🥶 Very low temperature - Frost warning - Cover crops and avoid irrigation";
+        } else {
+            return "🌤️ Optimal temperature - Normal watering schedule";
+        }
+    }
+
+    private String generateHumidityAdvice(WeatherResponse weatherResponse) {
+        double humidity = weatherResponse.getHumidity();
+        
+        if (humidity > 85) {
+            return "🦠 High humidity - Check crops for disease risk, ensure proper air circulation";
+        } else if (humidity > 70) {
+            return "🍃 Elevated humidity - Monitor for fungal diseases, avoid overhead irrigation";
+        } else if (humidity < 20) {
+            return "🌵 Very low humidity - Risk of plant stress, consider mulching to retain moisture";
+        } else {
+            return "🌿 Normal humidity - Favorable conditions for most crops";
+        }
+    }
+
+    private String generateGeneralAdvice(OpenWeatherResponse openWeatherResponse, WeatherResponse weatherResponse) {
+        StringBuilder generalAdvice = new StringBuilder();
+        
+        // Wind conditions
+        double windSpeed = weatherResponse.getWindSpeed();
+        if (windSpeed > 15) {
+            generalAdvice.append("💨 Strong winds - Secure loose items, consider wind protection for crops. ");
+        } else if (windSpeed > 8) {
+            generalAdvice.append("🍃 Moderate winds - Good for pollination, monitor for wind damage. ");
+        }
+        
+        // Weather conditions
+        if (openWeatherResponse.getWeather() != null && openWeatherResponse.getWeather().length > 0) {
+            String weatherMain = openWeatherResponse.getWeather()[0].getMain().toLowerCase();
+            
+            if (weatherMain.contains("clear")) {
+                generalAdvice.append("☀️ Clear skies - Optimal conditions for field work and spraying. ");
+            } else if (weatherMain.contains("clouds")) {
+                generalAdvice.append("☁️ Cloudy conditions - Reduced evaporation, good for transplanting. ");
+            } else if (weatherMain.contains("snow")) {
+                generalAdvice.append("❄️ Snow expected - Protect winter crops, delay field operations. ");
+            }
+        }
+        
+        // Temperature considerations
+        double temp = weatherResponse.getTemperature();
+        if (temp >= 15 && temp <= 30) {
+            generalAdvice.append("🌱 Optimal growing conditions - Excellent for most crop activities.");
+        }
+        
+        return generalAdvice.length() > 0 ? generalAdvice.toString() : "📊 Monitor conditions and adjust farming practices accordingly.";
     }
 }

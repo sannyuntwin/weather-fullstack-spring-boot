@@ -1,0 +1,86 @@
+.full-map-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+}
+
+.background-map {
+  width: 100%;
+  height: 100%;
+}
+
+/* Floating Toolbar on the Left */
+.map-toolbar {
+  position: absolute;
+  top: 100px; /* Below zoom controls */
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1000;
+}
+
+.tool-btn {
+  width: 40px;
+  height: 40px;
+  background: var(--bg-sidebar);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  transition: all 0.2s;
+}
+
+.tool-btn:hover {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+}
+
+/* Map Bottom Stats */
+.map-stats-overlay {
+  position: absolute;
+  bottom: 300px; /* Above BottomPanel */
+  left: 20px;
+  z-index: 1000;
+}
+
+.stat-pill {
+  background: var(--bg-sidebar);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  padding: 8px 15px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8rem;
+}
+
+.stat-pill label {
+  color: var(--text-secondary);
+}
+
+.stat-pill span {
+  font-weight: 600;
+}
+
+/* Popup Customization */
+.leaflet-popup-content-wrapper {
+  background: var(--bg-sidebar) !important;
+  color: var(--text-primary) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px !important;
+}
+
+.leaflet-popup-tip {
+  background: var(--bg-sidebar) !important;
+}

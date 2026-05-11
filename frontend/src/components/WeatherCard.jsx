@@ -3,7 +3,7 @@ import './WeatherCard.css';
 
 /**
  * WeatherCard component for displaying weather information.
- * This component receives weather data as props and displays it in a clean card format.
+ * Simple, clean display of weather data.
  */
 const WeatherCard = ({ weather }) => {
   // Function to get the weather icon URL from OpenWeather

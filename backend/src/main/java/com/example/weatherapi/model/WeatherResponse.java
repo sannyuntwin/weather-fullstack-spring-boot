@@ -17,6 +17,9 @@ public class WeatherResponse {
     private double windSpeed;
     private String description;
     private String icon;
+    private double latitude;
+    private double longitude;
+    private AgricultureAdvice agricultureAdvice;
 
     // Default constructor
     public WeatherResponse() {}
@@ -98,6 +101,30 @@ public class WeatherResponse {
 
     public void setIcon(String icon) {
         this.icon = icon;
+    }
+
+    public AgricultureAdvice getAgricultureAdvice() {
+        return agricultureAdvice;
+    }
+
+    public void setAgricultureAdvice(AgricultureAdvice agricultureAdvice) {
+        this.agricultureAdvice = agricultureAdvice;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 
     @Override
