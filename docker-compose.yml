@@ -1,0 +1,47 @@
+services:
+  # Backend Service - Spring Boot Weather API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: weather-backend
+    ports:
+      - "8080:8080"
+    environment:
+      # You can override the API key here or set it in backend/src/main/resources/application.properties
+      - OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY}
+    networks:
+      - weather-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/weather/test"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend Service - React Weather App
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   container_name: weather-frontend
+  #   ports:
+  #     - "5173:80"
+  #   depends_on:
+  #     - backend
+  #   networks:
+  #     - weather-network
+  #   restart: unless-stopped
+  #   environment:
+  #     - VITE_API_URL=http://localhost:8080
+
+# Network configuration
+networks:
+  weather-network:
+    driver: bridge
+
+# Optional: Volume for persistent logs
+volumes:
+  weather-logs:
+    driver: local
