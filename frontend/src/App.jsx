@@ -16,9 +16,41 @@ function App() {
 
   // Initial load
   useEffect(() => {
-    handleSearch('Campo Grande'); 
+    getCurrentLocation();
     fetchFields();
   }, []);
+
+  const getCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          handleSearchByCoords(latitude, longitude);
+        },
+        (error) => {
+          console.error("Geolocation error:", error);
+          handleSearch('Campo Grande'); // Fallback
+        }
+      );
+    } else {
+      handleSearch('Campo Grande');
+    }
+  };
+
+  const handleSearchByCoords = async (lat, lon) => {
+    setLoading(true);
+    setError('');
+    try {
+      const response = await fetch(`http://localhost:8080/api/weather/coords?lat=${lat}&lon=${lon}`);
+      if (!response.ok) throw new Error('Location not found');
+      const data = await response.json();
+      setWeatherData(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchFields = async () => {
     try {

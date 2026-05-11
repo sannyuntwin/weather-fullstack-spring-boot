@@ -24,42 +24,46 @@ const Sidebar = ({ weather, field }) => {
       <div className="sidebar-content">
         <section className="weather-section">
           <div className="section-header">
-            <h4>Weather today</h4>
+            <h4>Weather today: {weather.city}</h4>
             <span className="toggle-icon">▲</span>
           </div>
           
           <div className="weather-main">
             <div className="weather-desc">
-              <span className="condition">{weather.weather?.[0]?.description || 'Cloudy'}</span>
+              <span className="condition">{weather.description || 'Cloudy'}</span>
               <span className="date">{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
             </div>
             <div className="temp-display">
-              <span className="temp">{Math.round(weather.main?.temp || 0)}°</span>
-              <span className="weather-icon">☁</span>
+              <span className="temp">{Math.round(weather.temperature || 0)}°</span>
+              <span className="weather-icon">
+                {weather.icon ? <img src={`http://openweathermap.org/img/wn/${weather.icon}@2x.png`} alt="weather" /> : '☁'}
+              </span>
             </div>
           </div>
 
           <div className="weather-stats">
             <div className="stat">
               <label>Wind</label>
-              <span>{weather.wind?.speed} m/s ↙</span>
+              <span>{weather.windSpeed?.toFixed(1)} m/s ↙</span>
             </div>
             <div className="stat">
               <label>Humidity</label>
-              <span>{weather.main?.humidity}%</span>
+              <span>{weather.humidity}%</span>
             </div>
             <div className="stat">
               <label>Clouds</label>
-              <span>{weather.clouds?.all}%</span>
+              <span>{weather.clouds}%</span>
             </div>
           </div>
 
           <div className="precipitation">
             <div className="stat">
-              <label>Precipitation</label>
-              <span>0 mm</span>
+              <label>Strategic Advice</label>
+              <span style={{fontSize: '0.75rem', color: 'var(--accent-blue)'}}>
+                {weather.agricultureAdvice?.irrigationAdvice || 'Check fields'}
+              </span>
             </div>
-            <button className="forecast-link">Forecast</button>
+            <button className="forecast-link">Details</button>
           </div>
         </section>
 
@@ -83,9 +87,6 @@ const Sidebar = ({ weather, field }) => {
           </div>
 
           <button className="action-btn secondary">📱 GET THE LINK</button>
-          <div className="app-badges">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Play Store" />
-          </div>
           <button className="action-btn primary">+ ADD NEW TASK</button>
         </section>
       </div>

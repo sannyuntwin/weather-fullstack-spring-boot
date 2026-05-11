@@ -15,6 +15,7 @@ public class OpenWeatherResponse {
     private Main main;
     private Weather[] weather;
     private Wind wind;
+    private Clouds clouds;
     private Sys sys;
 
     // Getters and Setters
@@ -56,6 +57,14 @@ public class OpenWeatherResponse {
 
     public void setWind(Wind wind) {
         this.wind = wind;
+    }
+
+    public Clouds getClouds() {
+        return clouds;
+    }
+
+    public void setClouds(Clouds clouds) {
+        this.clouds = clouds;
     }
 
     public Sys getSys() {
@@ -157,6 +166,18 @@ public class OpenWeatherResponse {
 
         public void setSpeed(double speed) {
             this.speed = speed;
+        }
+    }
+
+    public static class Clouds {
+        private int all;
+
+        public int getAll() {
+            return all;
+        }
+
+        public void setAll(int all) {
+            this.all = all;
         }
     }
 

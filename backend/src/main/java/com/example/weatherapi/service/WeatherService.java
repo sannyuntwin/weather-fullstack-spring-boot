@@ -78,6 +78,27 @@ public class WeatherService {
     }
 
     /**
+     * Fetches weather data for specific coordinates from OpenWeather API.
+     */
+    public WeatherResponse getWeatherByCoordinates(double lat, double lon) {
+        try {
+            OpenWeatherResponse openWeatherResponse = webClient.get()
+                    .uri(baseUrl + "?lat={lat}&lon={lon}&appid={apiKey}&units=metric", lat, lon, apiKey)
+                    .retrieve()
+                    .bodyToMono(OpenWeatherResponse.class)
+                    .block();
+
+            WeatherResponse weatherResponse = convertToWeatherResponse(openWeatherResponse);
+            AgricultureAdvice agricultureAdvice = generateAgricultureAdvice(weatherResponse, openWeatherResponse);
+            weatherResponse.setAgricultureAdvice(agricultureAdvice);
+            
+            return weatherResponse;
+        } catch (Exception e) {
+            throw new RuntimeException("Error fetching weather for coordinates: " + e.getMessage());
+        }
+    }
+
+    /**
      * Converts OpenWeather API response to our WeatherResponse format.
      * 
      * @param openWeatherResponse Response from OpenWeather API
@@ -97,6 +118,11 @@ public class WeatherService {
         
         // Set wind speed
         response.setWindSpeed(openWeatherResponse.getWind().getSpeed());
+        
+        // Set clouds
+        if (openWeatherResponse.getClouds() != null) {
+            response.setClouds(openWeatherResponse.getClouds().getAll());
+        }
         
         // Set weather description and icon
         if (openWeatherResponse.getWeather() != null && openWeatherResponse.getWeather().length > 0) {

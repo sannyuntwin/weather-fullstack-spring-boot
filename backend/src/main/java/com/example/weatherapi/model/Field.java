@@ -14,6 +14,7 @@ public class Field {
     private Double area; // in hectares
     private Double latitude;
     private Double longitude;
+    private String polygonId; // ID from Agromonitoring API
 
     public Field() {}
 
@@ -35,4 +36,6 @@ public class Field {
     public void setLatitude(Double latitude) { this.latitude = latitude; }
     public Double getLongitude() { return longitude; }
     public void setLongitude(Double longitude) { this.longitude = longitude; }
+    public String getPolygonId() { return polygonId; }
+    public void setPolygonId(String polygonId) { this.polygonId = polygonId; }
 }

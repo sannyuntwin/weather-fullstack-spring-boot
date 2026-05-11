@@ -11,8 +11,8 @@ const FullMap = ({ weather }) => {
     if (!mapRef.current) return;
 
     // Center on field if weather is available, else default
-    const lat = weather?.coord?.lat || -26.6190;
-    const lon = weather?.coord?.lon || -55.1699;
+    const lat = weather?.latitude || -26.6190;
+    const lon = weather?.longitude || -55.1699;
 
     if (!mapInstanceRef.current) {
       // Initialize map

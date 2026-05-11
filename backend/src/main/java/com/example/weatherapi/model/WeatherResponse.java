@@ -15,6 +15,7 @@ public class WeatherResponse {
     private double feelsLike;
     private int humidity;
     private double windSpeed;
+    private int clouds;
     private String description;
     private String icon;
     private double latitude;
@@ -85,6 +86,14 @@ public class WeatherResponse {
 
     public void setWindSpeed(double windSpeed) {
         this.windSpeed = windSpeed;
+    }
+
+    public int getClouds() {
+        return clouds;
+    }
+
+    public void setClouds(int clouds) {
+        this.clouds = clouds;
     }
 
     public String getDescription() {
